@@ -43,3 +43,4 @@ peda-session-*
 CMakeFiles/
 Makefile
 *.cmake
+CMakeCache.txt
