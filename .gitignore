@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+**/bin
+
+# Emacs Temp Files
+*~
+
+# PEDA files
+.gdb_history
+peda-session-*
+
+# CMake
+CMakeFiles/
+Makefile
+*.cmake
