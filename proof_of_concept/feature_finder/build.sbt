@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
 
   settings(
     inThisBuild(List(
-      organization := "edu.rose-hulman",
+      organization := "edu.rose",
       scalaVersion := "2.11.8"
     )),
     name := "feature_finder",
@@ -27,7 +27,10 @@ lazy val root = (project in file(".")).
 
       "org.scalatest" %% "scalatest" % "3.0.1" % "test",
       "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-      "com.holdenkarau" %% "spark-testing-base" % "2.3.0_0.9.0" % "test" 
+      "com.holdenkarau" %% "spark-testing-base" % "2.3.0_0.9.0" % "test",
+      "org.scalanlp" %% "breeze" % "0.13.2",
+      "org.scalanlp" %% "breeze-natives" % "0.13.2",
+      "org.scalanlp" %% "breeze-viz" % "0.13.2"
     ),
 
     // uses compile classpath for the run task, including "provided" jar (cf http://stackoverflow.com/a/21803413/3827)

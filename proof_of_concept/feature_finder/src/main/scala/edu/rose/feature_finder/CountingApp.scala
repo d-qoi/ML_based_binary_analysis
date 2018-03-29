@@ -1,4 +1,4 @@
-package edu.rose-hulman.feature_finder
+package edu.rose.feature_finder
 
 import org.apache.spark.{SparkConf, SparkContext}
 
