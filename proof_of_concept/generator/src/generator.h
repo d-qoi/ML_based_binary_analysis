@@ -8,14 +8,13 @@
 #define DEFAULT_SIZE (8192)
 // in percentage, it will divide by this number, so 10 is 10%, 100 is 1%
 #define PACKING_DENSITY (10)
-
-
-#define DEBUG
+#define MINIMUM_NUMBER (10)
 
 typedef struct DLL {
   void* prev;
   void* next;
-  void* value;
+  void* value1;
+  void* value2;
 } DLL;
 
 
