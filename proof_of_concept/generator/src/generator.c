@@ -27,7 +27,7 @@ int generate_data(void* start_region, void* end_region, FILE *fp) {
     printf("Number: %d\n", number);
   }
 
-  fprintf(fp, "0x%lux, 0x%lux, ", (uint64_t)start_region, (uint64_t)end_region);
+  fprintf(fp, "0x%lx, 0x%lx, ", (uint64_t)start_region, (uint64_t)end_region);
   fprintf(fp, "0x%x; ", number);
 
   for (int i = 0; i<number; i++) {
@@ -46,7 +46,7 @@ int generate_data(void* start_region, void* end_region, FILE *fp) {
     current->value1 = rand();
     current->value2 = i;
 
-    fprintf(fp, "0x%lux, ", (uint64_t)current);
+    fprintf(fp, "0x%lx, ", (uint64_t)current);
 
     previous = current;
   }

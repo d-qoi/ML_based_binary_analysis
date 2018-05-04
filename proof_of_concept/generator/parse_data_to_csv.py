@@ -14,7 +14,7 @@ def parse_line(line, file_name):
     d['end_of_region'] = head[1].strip()
     d['number_of_nodes'] = int(head[2].strip(), 16)
     for i in range(len(nodes)-1):
-        d[i] = nodes[i].strip()
+        d[i] = int(nodes[i].strip(), 16) - int(d['start_of_region'], 16)
     d['data'] = tail
     d['file_name'] = file_name
     return d
@@ -69,10 +69,10 @@ if debug:
     print("Max number of nodes: {}".format(max_nodes))
 
 header = []
+header += ['file_name']
 header += ['start_of_region','end_of_region','number_of_nodes']
 header += list(range(max_nodes))
 header += ['data']
-header += ['file_name']
 
 if not exists(dest_file) or isfile(dest_file):
     if debug:
