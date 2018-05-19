@@ -60,13 +60,16 @@ class Input(object):
         self.input_data, self.targets = batch_producer(data, batch_size, num_steps)
 
 class Model(object):
-    def __init__(self, inpt, is_training, hidden_size, vocab_size, num_layers, dropout=0.5, init_scale=0.05):
+
+    def __init__(self, inpt, is_training, hidden_size, vocab_size, num_layers, dropout=0.5, init_scale=0.05, forget_bias=1.0):
         self.is_training = is_training
-        self.inpt_obj = inpt
+        self.input_obj = inpt
         self.batch_size = inpt.batch_size
         self.num_steps = inpt.num_steps
         self.hidden_size = hidden_size
 
+        embedding = tf.Variable(tf.random_uniform([vocab_size, self.hidden_size], -init_scale, init_scale))
+        inputs = tf.nn.embedding_lookup(embedding, self.input_obj.input_data)
 
         if is_training and dropout < 1:
             inputs = tf.nn.dropout(inputs, dropout)
@@ -78,3 +81,16 @@ class Model(object):
             [tf.contrib.rnn.LSTMStateTuple(state_per_layer_list[idx][0], state_per_layer_list[idx][1])
              for idx in range(num_layers)]
         )
+
+        cell = tf.contrib.rnn.LSTMCell(hidden_size, forget_bias=forget_bias)
+
+
+        if is_training and dropout < 1:
+            cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=dropout)
+
+        if num_layers > 1:
+            cell = tf.contrib.rnn.MultiRNNCell([cell for _ in range(num_layers)], state_is_tuple=True)
+
+        output, self.state = tf.nn.dynamic_rnn(cell, inputs, dtype=tf.float32, initial_state=rnn_tuple_state)
+
+        output = tf.reshape(output, [-1, hidden_size])
