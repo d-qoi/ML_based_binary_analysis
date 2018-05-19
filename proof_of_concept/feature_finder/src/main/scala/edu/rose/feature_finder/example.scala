@@ -18,34 +18,72 @@ object Runner {
 
     val df = spark.read.format("csv").option("header","true").option("inferSchema","true").load(args(0))
 
-    df.select("1").show()
+    //df.select($"*", Array($"v1", $"v2", $"v3", $"v4", $"v5", $"v6", $"v7", $"v8", $"v9", $"v10").as("labels"))
 
-    val vecass = new VectorAssembler()
-      .setInputCols(Array("1","2","3","4","5","6","7","8","9","10"))
-      .setOutputCol("labels")
+    df.select("v1").show()
+
+    //return
+
+    val sqlt = new SQLTransformer().setStatement("SELECT *, (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) as labels FROM __THIS__")
+
+    // val vecass = new VectorAssembler()
+    //   .setInputCols(Array("1","2","3","4","5","6","7","8","9","10"))
+    //   .setOutputCol("labels")
+
+    val res1 = sqlt.transform(df)
+
+    res1.select("labels").show()
+
+    def from_hex(input:Array[String]):Array[Int] = input.map(x=>Integer.parseInt(x, 16))
+    spark.udf.register("from_hex", from_hex(_:Array[String]))
+
+
+    //val labelindex = new StringIndexer()
+    //  .setInputCol("labels")
+    //  .setOutputCol("labels_ind")
 
     //val vecassModel = vecass.fit(df)
 
     val regtok = new RegexTokenizer()
       .setInputCol("data")
       .setOutputCol("data_tok")
-      .setPattern(".")
+      .setPattern(".").setGaps(false)
 
-    val indexer = new StringIndexer().setInputCol("data_tok").setOutputCol("data_ind_tok")
+    //val model2 = regtok.transform(model1)
 
-    val ng = new NGram().setN(2).setInputCol("data_ind_tok").setOutputCol("data_ngrams")
+    //val indexer = new StringIndexer().setInputCol("data_tok").setOutputCol("data_ind_tok")
 
-    // val MHLSH = new MinHashLSH()
-    //   .setNumHashTable(5)
+    //val model3 = indexer.fit(model2).transform(model2)
+
+    val sqlt2 = new SQLTransformer().setStatement("SELECT *, from_hex(data_tok) as data_tok_ind FROM __THIS__")
+
+    val ng = new NGram().setN(2*8*3).setInputCol("data_tok").setOutputCol("data_ngrams")
+
+    //val model4 = ng.transform(model3)
+
+    //model4.select("data_ngrams").show()
+
+    // val mhlsh = new MinHashLSH()
+    //   .(5)
     //   .setInputCol("data_ngrams")
-    //   .setOutputCol("hashes").fit(df)
+    //   .setOutputCol("hashes")
 
-    //val MHLSHModel = MHLSH.fit(df)
 
     val bkm = new BisectingKMeans().setK(2)
       .setFeaturesCol("data_ngrams")
       .setPredictionCol("bkm_predictions")
-      .setMaxIter(15).fit(df)
+      .setMaxIter(15)
+
+
+    // val pipeline = new Pipeline()
+    //   .setStages(Array( regtok, sqlt, ng, bkm))
+
+    // pipeline.fit(df).transform(df).select("data_tok", "data_ngrams").show()
+
+
+    // return
+
+    //val MHLSHModel = MHLSH.fit(df)
 
     val Array(trainingData, testData) = df.randomSplit(Array(0.7, 0.3))
 
@@ -55,7 +93,8 @@ object Runner {
       .setNumTrees(15)
 
     val pipeline = new Pipeline()
-      .setStages(Array(vecass, regtok, indexer, ng, bkm, rf))
+      .setStages(Array(regtok, sqlt, sqlt2, ng, bkm, rf))
+
 
     val model = pipeline.fit(trainingData)
 
@@ -70,10 +109,10 @@ object Runner {
 
     val accuracy = evaluator.evaluate(predictions)
     println(s"Test Error = ${(1.0 - accuracy)}")
-
   }
 
 }
+
 
 object FeatureExtractor {
   def main(args: Array[String]) {
