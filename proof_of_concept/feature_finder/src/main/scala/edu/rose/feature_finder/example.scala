@@ -88,37 +88,3 @@ object FeatureExtractor {
     spark.stop()
   }
 }
-
-
-/**
-  * Use this to test the app locally, from sbt:
-  * sbt "run inputFile.txt outputFile.txt"
-  *  (+ select CountingLocalApp when prompted)
-  */
-/*
-object CountingLocalApp extends App{
-  val (inputFile, outputFile) = (args(0), args(1))
-  val conf = new SparkConf()
-    .setMaster("local")
-    .setAppName("This is a test app.")
-
-  Runner.run(conf)
-}
-
-/**
-  * Use this when submitting the app to a cluster with spark-submit
-  * */
-object CountingApp extends App{
-  val (inputFile, outputFile) = (args(0), args(1))
-
-  // spark-submit command should supply all necessary config elements
-  Runner.run(new SparkConf())
-}
-
-object Runner {
-  def run(conf: SparkConf): Unit = {
-    val sc = new SparkContext(conf)
-    println("In the runner")
-  }
-}
-*/
